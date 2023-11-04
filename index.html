@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Clicker Empire Game</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+		<div class="vh-100 bg-dark">
+			<div id="initPage">
+				<div class="vh-100 d-flex justify-content-center align-items-center">
+		            <div class="bg-white p-4">
+		                <h3 class="pb-3">Clicker Empire Game</h3>
+		                <form id="userInfo">
+		                    <div class="form-group">
+		                        <input type="text" class="form-control" name="playerName" placeholder="Your Name" value="Makoto" required>
+		                    </div>
+		                    <div class="d-flex justify-content-between pt-2">
+		                        <div class="col-6 pl-0">
+		                            <button type="submit" class="btn btn-primary col-12" id="newGame">New</button>
+		                        </div>
+		                        <div class="col-6 pr-0">
+		                            <button type="submit" class="btn btn-primary col-12" id="login">Login</button>
+		                        </div>
+		                    </div>
+		                </form>
+		            </div>
+		        </div>
+			</div>
+			<div id="mainPage"></div>
+		</div>
+
+		<script src="main.js"></script>
+	</body>
+</html>
