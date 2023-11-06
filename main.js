@@ -58,27 +58,6 @@ function initialize() {
 	config.mainPage.append(mainGamePage(user));
 }
 
-function mainGamePage(user) {
-	let outerCon = document.createElement("div");
-	outerCon.classList.add("vh-100", "d-flex", "justify-content-center", "align-items-center");
-	let innerCon = document.createElement("div");
-	innerCon.classList.add("bg-navy", "col-12", "col-md-10", "p-2");
-
-	let leftCon = document.createElement("div");
-	leftCon.classList.add("col-4", "bg-dark", "p-2")
-	leftCon.append(burgerView());
-
-	let rightCon = document.createElement("div");
-	rightCon.classList.add("col-8");
-	let bottomCon = document.createElement("div");
-
-	rightCon.append(bottomCon);
-	innerCon.append(leftCon, rightCon);
-	outerCon.append(innerCon);
-
-	return outerCon;
-}
-
 function burgerView() {
 	let container = document.createElement("div");
 	container.innerHTML = 
@@ -95,3 +74,116 @@ function burgerView() {
 	`
 	return container;
 }
+
+function playerView(user) {
+	let container = document.createElement("div");
+	container.innerHTML = 
+	`
+		<div>
+			<div class="d-flex flex-wrap text-white text-center p-1">
+				<div class="col-6 bg-navy b-dark">
+					<p>${user.name}</p>
+				</div>
+				<div class="col-6 bg-navy b-dark">
+					<p>${user.age}</p>
+				</div>
+				<div class="col-6 bg-navy b-dark">
+					<p>${user.days} days</p>
+				</div>
+				<div class="col-6 bg-navy b-dark">
+					<p>￥${user.money}</p>
+				</div>
+			</div>
+		</div>
+	`
+	return container;
+}
+
+function itemsView(user) {
+	let container = document.createElement("div");
+	container.classList.add("bg-dark", "scrollbar");
+	for (let i=0; i<user.items.length; i++) {
+		container.innerHTML += 
+		`
+			<div class="d-flex align-items-center bg-navy m-2 items-click" id="itemBtn">
+				<div class="d-none d-sm-block">
+					<img src="${user.items[i].imgUrl}" class="img-fixed">
+				</div>
+				<div class="col-sm-9">
+					<div class="d-flex justify-content-between text-white">
+						<h4>${user.items[i].name}</h4>
+						<p>${user.items[i].currAmount}</p>
+					</div>
+					<div class="d-flex justify-content-between">
+						<p class="text-white">￥${user.items[i].price}</p>
+						<p class="text-success">￥${user.items[i].perPrice}/${getItemType(user.items[i].type)}</p>
+					</div>
+				</div>
+			</div>
+		`
+	}
+
+	for (let i=0; i<user.items.length; i++) {
+		container.querySelectorAll("#itemBtn")[i].addEventListener("click", function() {
+			console.log(user.items[i].name);
+		});
+	}
+
+	return container;
+}
+
+function resetSaveView() {
+	let container = document.createElement("div");
+	container.innerHTML = 
+	`
+		<div class="d-flex justify-content-end pt-2">
+			<div class="b-white text-white p-2 mr-2 hover move-on-click" id="reset">
+				<i class="fa-solid fa-arrow-rotate-left fa-2x"></i>
+			</div>
+			<div class="b-white text-white p-2 hover move-on-click" id="save">
+				<i class="fa-regular fa-floppy-disk fa-2x"></i>
+			</div>
+		</div>
+	`
+
+	let resetBtn = container.querySelectorAll("#reset")[0];
+	resetBtn.addEventListener("click", function() {
+		alert("reset btn");
+	});
+
+	let saveBtn = container.querySelectorAll("#save")[0];
+	saveBtn.addEventListener("click", function() {
+		alert("save btn");
+	});
+
+	return container;
+}
+
+function getItemType(type) {
+	if (type === "ability") return "click";
+    else if (type === "investment") return "sec";
+    else if (type === "realEstate") return "sec";
+}
+
+function mainGamePage(user) {
+	let outerCon = document.createElement("div");
+	outerCon.classList.add("vh-100", "d-flex", "justify-content-center", "align-items-center");
+	let innerCon = document.createElement("div");
+	innerCon.classList.add("bg-navy", "col-12", "col-md-10", "p-2", "d-flex");
+
+	let leftCon = document.createElement("div");
+	leftCon.classList.add("col-4", "bg-dark", "p-2")
+	leftCon.append(burgerView(user));
+
+	let rightCon = document.createElement("div");
+	rightCon.classList.add("col-8");
+	rightCon.append(playerView(user));
+	rightCon.append(itemsView(user));
+	rightCon.append(resetSaveView());
+
+	innerCon.append(leftCon, rightCon);
+	outerCon.append(innerCon);
+
+	return outerCon;
+}
+
