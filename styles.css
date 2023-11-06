@@ -1,0 +1,21 @@
+body {
+    font-family: Futura!important;
+    letter-spacing: 0.02em!important;
+}
+
+.bg-navy{
+    background-color: #3c5279;
+}
+
+.hover:hover {
+    opacity: 0.9;
+}
+
+.move-on-click {
+    transition: transform 0.1s ease;
+    cursor: pointer;
+}
+
+.move-on-click:active {
+    transform: scale(0.99) translate(1px, 1px); /* こちらの値を調整して、好きな動きを実現できます */
+}

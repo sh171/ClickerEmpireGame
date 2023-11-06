@@ -1,5 +1,5 @@
 config = {
-	intiPage : document.getElementById("initPage"), 
+	initPage : document.getElementById("initPage"), 
 	mainPage : document.getElementById("mainPage")
 }
 
@@ -40,5 +40,58 @@ const itemList = [
 ]
 
 
-let user = new UserAccount("Makoto", 20, 50000, 0, itemList);
-console.log(user)
+// let user = new UserAccount("Makoto", 20, 50000, 0, itemList);
+// console.log(user)
+
+function initialize() {
+	let form = document.getElementById("userInfo")
+	let user = new UserAccount(
+		form.querySelectorAll(`input[name="playerName"]`)[0].value, 
+		20, 
+		50000, 
+		0, 
+		itemList
+	)
+	console.log(user)
+
+	config.initPage.classList.add("d-none");
+	config.mainPage.append(mainGamePage(user));
+}
+
+function mainGamePage(user) {
+	let outerCon = document.createElement("div");
+	outerCon.classList.add("vh-100", "d-flex", "justify-content-center", "align-items-center");
+	let innerCon = document.createElement("div");
+	innerCon.classList.add("bg-navy", "col-12", "col-md-10", "p-2");
+
+	let leftCon = document.createElement("div");
+	leftCon.classList.add("col-4", "bg-dark", "p-2")
+	leftCon.append(burgerView());
+
+	let rightCon = document.createElement("div");
+	rightCon.classList.add("col-8");
+	let bottomCon = document.createElement("div");
+
+	rightCon.append(bottomCon);
+	innerCon.append(leftCon, rightCon);
+	outerCon.append(innerCon);
+
+	return outerCon;
+}
+
+function burgerView() {
+	let container = document.createElement("div");
+	container.innerHTML = 
+	`
+		<div>
+			<div class="bg-navy text-white text-center">
+				<p>0 Burgers</p>
+				<p>￥25/click</p>
+			</div>
+			<div class="d-flex justify-content-center">
+				<img src="https://cdn.pixabay.com/photo/2014/04/02/17/00/burger-307648_960_720.png" width="80%" class="hover move-on-click" alt="burger">
+			</div>
+		</div>
+	`
+	return container;
+}
