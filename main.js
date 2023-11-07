@@ -18,6 +18,11 @@ class UserAccount {
 		this.burgerCount++;
 		this.money += this.burgerPerPrice;
 	}
+
+	dayTime() {
+		this.days++;
+		if (this.days % 365 == 0) this.age++;
+	}
 }
 
 class Items {
@@ -65,6 +70,8 @@ function initialize() {
 
 	config.initPage.classList.add("d-none");
 	config.mainPage.append(mainGamePage(user));
+
+	startTimer(user);
 }
 
 function burgerView(user) {
@@ -192,6 +199,7 @@ function itemPurchaseView(user, i) {
 function getTotalPrice(item, cntVal) {
 	let total = 0;
 	if (item.name === "ETF Stock") {
+		// Every purchase increases the price by 10%
         for (let i=0; i<cntVal; i++) {
             total += Math.floor(item.price * Math.pow(1 + item.perPrice, i));
         }
@@ -254,6 +262,14 @@ function mainGamePage(user) {
 	outerCon.append(innerCon);
 
 	return outerCon;
+}
+
+function startTimer(user) {
+	setInterval(function() {
+		user.dayTime();
+
+		updatePlayerInfo(user);
+	}, 1000)
 }
 
 function updatePlayerInfo(user) {
