@@ -4,12 +4,19 @@ config = {
 }
 
 class UserAccount {
-	constructor(name, age, money, days, items) {
+	constructor(name, age, money, days, burgerCount, burgerPerPrice, items) {
 		this.name = name;
 		this.age = age;
 		this.money = money;
 		this.days = days;
+		this.burgerCount = burgerCount;
+		this.burgerPerPrice = burgerPerPrice;
 		this.items = items;
+	}
+
+	burgerIncome() {
+		this.burgerCount++;
+		this.money += this.burgerPerPrice;
 	}
 }
 
@@ -50,6 +57,8 @@ function initialize() {
 		20, 
 		50000, 
 		0, 
+		0, 
+		25, 
 		itemList
 	)
 	console.log(user)
@@ -58,20 +67,24 @@ function initialize() {
 	config.mainPage.append(mainGamePage(user));
 }
 
-function burgerView() {
+function burgerView(user) {
 	let container = document.createElement("div");
 	container.innerHTML = 
 	`
-		<div>
+		<div id="burger">
 			<div class="bg-navy text-white text-center">
-				<p>0 Burgers</p>
-				<p>￥25/click</p>
+				<p>${user.burgerCount} Burgers</p>
+				<p>￥${user.burgerPerPrice}/click</p>
 			</div>
 			<div class="d-flex justify-content-center">
-				<img src="https://cdn.pixabay.com/photo/2014/04/02/17/00/burger-307648_960_720.png" width="80%" class="hover move-on-click" alt="burger">
+				<img src="https://cdn.pixabay.com/photo/2014/04/02/17/00/burger-307648_960_720.png" width="80%" class="hover move-on-click" id="burger" alt="burger">
 			</div>
 		</div>
 	`
+	let clickB = container.querySelectorAll("#burger")[0];
+	clickB.addEventListener("click", function() {
+		updateBurgerAmount(user);
+	});
 	return container;
 }
 
@@ -79,7 +92,7 @@ function playerView(user) {
 	let container = document.createElement("div");
 	container.innerHTML = 
 	`
-		<div>
+		<div id="player">
 			<div class="d-flex flex-wrap text-white text-center p-1">
 				<div class="col-6 bg-navy b-dark">
 					<p>${user.name}</p>
@@ -104,7 +117,7 @@ function itemsView(user) {
 	container.classList.add("bg-dark", "scrollbar");
 	for (let i=0; i<user.items.length; i++) {
 		container.innerHTML += 
-		`
+		` 
 			<div class="d-flex align-items-center bg-navy m-2 items-click" id="itemBtn">
 				<div class="d-none d-sm-block">
 					<img src="${user.items[i].imgUrl}" class="img-fixed">
@@ -125,11 +138,67 @@ function itemsView(user) {
 
 	for (let i=0; i<user.items.length; i++) {
 		container.querySelectorAll("#itemBtn")[i].addEventListener("click", function() {
-			console.log(user.items[i].name);
+			container.innerHTML = "";
+			container.append(itemPurchaseView(user, i));
 		});
 	}
 
 	return container;
+}
+
+function itemPurchaseView(user, i) {
+	let container = document.createElement("div");
+	container.innerHTML = 
+	`
+		<div class="bg-navy m-2 p-2 text-white">
+			<div class="d-flex justify-content-center align-items-center col-12">
+				<div class="col-6">
+					<h4>${user.items[i].name}</h4>
+					<p>Max purchases: ${user.items[i].maxAmount}</p>
+					<p>Price: ￥${user.items[i].price}</p>
+					<p>Get ￥${user.items[i].perPrice}/${getItemType(user.items[i].type)}</p>
+				</div>
+				<div class="col-6">
+					<img src="${user.items[i].imgUrl}" class="img-fixed">
+				</div>
+			</div>
+			<p>How many would you like to buy?</p>
+			<input class="col-12 number-input" type="number" name="" placeholder="0" min="1" max=${user.items[i].maxAmount}>
+			<p class="text-right" id="totalPrice">total: ￥0</p>
+			<div class="d-flex mb-3">
+				<div class="col-6 pl-0">
+					<button type="button" class="btn btn-outline-primary bg-light col-12 back-Btn">Go Back</button>
+				</div>
+				<div class="col-6 pr-0">
+					<button type="button" class="btn btn-primary col-12 purchase-Btn">purchase</button>
+				</div>
+			</div>
+		</div>
+	`
+
+	let backBtn = container.querySelectorAll(".back-Btn")[0];
+	backBtn.addEventListener("click", function() {
+		container.innerHTML = "";
+		container.append(itemsView(user));
+	});
+
+	let numberInput = container.querySelectorAll(".number-input")[0];
+	numberInput.addEventListener("change", function() {
+		document.getElementById("totalPrice").innerHTML = "total: ￥" + getTotalPrice(user.items[i], numberInput.value);
+	});
+	return container;
+}
+
+function getTotalPrice(item, cntVal) {
+	let total = 0;
+	if (item.name === "ETF Stock") {
+        for (let i=0; i<cntVal; i++) {
+            total += Math.floor(item.price * Math.pow(1 + item.perPrice, i));
+        }
+        return total;
+    }
+    else if (cntVal > 0) return total += item.price * cntVal;
+    else return total;
 }
 
 function resetSaveView() {
@@ -187,3 +256,21 @@ function mainGamePage(user) {
 	return outerCon;
 }
 
+function updatePlayerInfo(user) {
+	let playerId = config.mainPage.querySelectorAll("#player")[0];
+	playerId.innerHTML = "";
+	playerId.append(playerView(user));
+}
+
+function updateBurgerView(user) {
+	let burgerId = config.mainPage.querySelectorAll("#burger")[0];
+	burgerId.innerHTML = "";
+	burgerId.append(burgerView(user));
+}
+
+function updateBurgerAmount(user) {
+	user.burgerIncome();
+
+	updateBurgerView(user);
+	updatePlayerInfo(user);
+}
