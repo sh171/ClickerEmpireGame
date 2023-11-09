@@ -4,13 +4,14 @@ config = {
 }
 
 class UserAccount {
-	constructor(name, age, money, days, burgerCount, burgerPerPrice, items) {
+	constructor(name, age, money, days, burgerCount, burgerPerPrice, earnMoneyPerSec, items) {
 		this.name = name;
 		this.age = age;
 		this.money = money;
 		this.days = days;
 		this.burgerCount = burgerCount;
 		this.burgerPerPrice = burgerPerPrice;
+		this.earnMoneyPerSec = earnMoneyPerSec;
 		this.items = items;
 	}
 
@@ -23,6 +24,33 @@ class UserAccount {
 		this.days++;
 		if (this.days % 365 == 0) this.age++;
 	}
+
+	purchaseItem(price, cntVal, index) {
+		this.money -= price;
+		this.items[index].currAmount += cntVal;
+	}
+
+	updateEarnMoney(price, cntValue, i) {
+        if (this.items[i].type === "ability") {
+            this.burgerPerPrice += this.items[i].perPrice * cntValue;
+        }
+        else if (this.items[i].type === "investment") {
+            if (this.items[i].name === "ETF Stock") {
+                this.items[i].price = Math.floor(this.items[i].price * Math.pow(1 + this.items[i].perPrice, cntValue));
+                this.earnMoneyPerSec += Math.floor(price * this.items[i].perPrice);
+            }
+            else if (this.items[i].name === "ETF Bond") {
+                this.earnMoneyPerSec += Math.floor(price * this.items[i].perPrice);
+            }
+        }
+        else if (this.items[i].type === "realEstate") {
+            this.earnMoneyPerSec += this.items[i].perPrice * cntValue;
+        }
+    }
+
+    incomeGain() {
+    	this.money += this.earnMoneyPerSec;
+    }
 }
 
 class Items {
@@ -51,22 +79,18 @@ const itemList = [
     new Items("Bullet-Speed Sky RailWay", "realEstate", 0, 1, 30000000000, 10000000000000, "https://cdn.pixabay.com/photo/2013/07/13/10/21/train-157027_960_720.png") 
 ]
 
-
-// let user = new UserAccount("Makoto", 20, 50000, 0, itemList);
-// console.log(user)
-
 function initialize() {
 	let form = document.getElementById("userInfo")
 	let user = new UserAccount(
 		form.querySelectorAll(`input[name="playerName"]`)[0].value, 
 		20, 
-		50000, 
+		500000, 
 		0, 
 		0, 
-		25, 
+		25,
+		0,  
 		itemList
 	)
-	console.log(user)
 
 	config.initPage.classList.add("d-none");
 	config.mainPage.append(mainGamePage(user));
@@ -149,7 +173,6 @@ function itemsView(user) {
 			container.append(itemPurchaseView(user, i));
 		});
 	}
-
 	return container;
 }
 
@@ -193,6 +216,21 @@ function itemPurchaseView(user, i) {
 	numberInput.addEventListener("change", function() {
 		document.getElementById("totalPrice").innerHTML = "total: ￥" + getTotalPrice(user.items[i], numberInput.value);
 	});
+
+	let purchaseBtn = container.querySelectorAll(".purchase-Btn")[0];
+	purchaseBtn.addEventListener("click", function() {
+		let totalPrice = getTotalPrice(user.items[i], parseInt(numberInput.value));
+        if (user.money < totalPrice) alert("You don't have enough money.");
+        else if (user.items[i].maxAmount < parseInt(numberInput.value) + user.items[i].currAmount) alert("You can't buy anymore.");
+        else if (numberInput.value == 0 || numberInput.value < 0) alert("Invalid Number");
+        else {
+            user.purchaseItem(totalPrice, parseInt(numberInput.value), i);
+            user.updateEarnMoney(totalPrice, numberInput.value, i);
+
+            config.mainPage.innerHTML = "";
+            config.mainPage.append(mainGamePage(user));
+        }
+	});
 	return container;
 }
 
@@ -209,7 +247,7 @@ function getTotalPrice(item, cntVal) {
     else return total;
 }
 
-function resetSaveView() {
+function resetSaveView(user) {
 	let container = document.createElement("div");
 	container.innerHTML = 
 	`
@@ -225,12 +263,15 @@ function resetSaveView() {
 
 	let resetBtn = container.querySelectorAll("#reset")[0];
 	resetBtn.addEventListener("click", function() {
-		alert("reset btn");
+		alert("RESET DATA");
 	});
 
 	let saveBtn = container.querySelectorAll("#save")[0];
 	saveBtn.addEventListener("click", function() {
-		alert("save btn");
+		saveData(user);
+		stopTimer();
+		config.initPage.classList.remove("d-none");
+		config.mainPage.innerHTML = "";
 	});
 
 	return container;
@@ -256,7 +297,7 @@ function mainGamePage(user) {
 	rightCon.classList.add("col-8");
 	rightCon.append(playerView(user));
 	rightCon.append(itemsView(user));
-	rightCon.append(resetSaveView());
+	rightCon.append(resetSaveView(user));
 
 	innerCon.append(leftCon, rightCon);
 	outerCon.append(innerCon);
@@ -265,11 +306,15 @@ function mainGamePage(user) {
 }
 
 function startTimer(user) {
-	setInterval(function() {
+	timerInterval = setInterval(function() {
 		user.dayTime();
-
+		user.incomeGain();
 		updatePlayerInfo(user);
 	}, 1000)
+}
+
+function stopTimer() {
+	clearInterval(timerInterval);
 }
 
 function updatePlayerInfo(user) {
@@ -289,4 +334,10 @@ function updateBurgerAmount(user) {
 
 	updateBurgerView(user);
 	updatePlayerInfo(user);
+}
+
+function saveData(user) {
+	let userJsonString = JSON.stringify(user);
+    localStorage.setItem(user.name, userJsonString);
+    alert("Saved");
 }
