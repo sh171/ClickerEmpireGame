@@ -10,3 +10,5 @@ Dive into the world of "Clicker Empire Game", an immersive simulation where play
 1. Interactivity: Begin with a balance of 500 dollars. Earn additional funds by clicking on the grill, adding 25 cents with each click. Within the game, there's a plethora of items awaiting your purchase.
 1. Time Dynamics: In this virtual universe, time flies! A second in real life equates to a full day in-game.
 1. Save & Load Feature: Never lose your progress! Save your game state when exiting and effortlessly load it up during your next gaming session.
+
+Link Page: https://sh171.github.io/ClickerEmpireGame/
